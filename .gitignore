@@ -1,0 +1,18 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Mac
+.DS_Store
+
+# FAISS / vector stores
+faiss_store/
+
+# Environment variables
+.env
+
+# Jupyter
+.ipynb_checkpoints/

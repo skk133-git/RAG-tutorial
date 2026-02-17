@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RAG Chatbot</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .chat {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        button {
+            margin-top: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        #question {
+            height: 80px;
+        }
+    </style>
+</head>
+
+<body>
+    
+
+<h2>RAG Chatbot</h2>
+
+<textarea id="question" placeholder="Ask a question..."></textarea>
+<br>
+<button onclick="ask()">Ask</button>
+
+<hr>
+<h3> Upload Documents</h3>
+<input type="file" id="file">
+<button onclick="upload()">Upload</button>
+<hr>
+
+
+<div id="chats">
+    {% for chat in chats %}
+    <div class="chat" id="chat-{{ chat.id }}">
+        <b>Q:</b>
+        <textarea id="q-{{ chat.id }}">{{ chat.question }}</textarea>
+
+        <br><b>A:</b>
+        <p id="a-{{ chat.id }}">{{ chat.answer }}</p>
+
+        <button onclick="resubmit({{ chat.id }})">Resubmit</button>
+        <button onclick="deleteChat({{ chat.id }})">Delete</button>
+
+    </div>
+    {% endfor %}
+</div>
+
+
+<script>
+function ask() {
+    const question = document.getElementById("question").value;
+    if (!question.trim()) return;
+
+    fetch("/ask", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ question })
+    }).then(() => location.reload());
+}
+
+function upload() {
+    const fileInput = document.getElementById("file");
+    if (!fileInput.files.length) {
+        alert("Please select a file first!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    fetch("/upload", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => alert(data.message))
+    .catch(err => console.error(err));
+}
+
+function resubmit(id) {
+    const question = document.getElementById(`q-${id}`).value;
+
+    fetch(`/resubmit/${id}`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({question})
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById(`a-${id}`).innerText = data.answer;
+    });
+}
+
+
+function editChat(id, value) {
+    fetch(`/edit/${id}`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ question: value })
+    });
+}
+
+function deleteChat(id) {
+    fetch(`/delete/${id}`, {
+        method: "DELETE"
+    }).then(() => location.reload());
+}
+</script>
+
+</body>
+</html>
