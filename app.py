@@ -11,7 +11,6 @@ CHAT_FILE = "chat_history.json"
 app = Flask(__name__)
 UPLOAD_FOLDER = os.path.join("data", "uploaded")
 
-
 def load_chats():
     if not os.path.exists(CHAT_FILE):
         return []
@@ -27,7 +26,6 @@ from src.data_loader import load_all_documents
 from src.vectorstore import FaissVectorStore
 from src.search import RAGSearch
 
-
 all_docs = load_all_documents("data")
 
 store = FaissVectorStore("faiss_store")
@@ -42,6 +40,8 @@ else:
 rag = RAGSearch(store)
 print("RAG system ready!")
 
+
+# ---------- Init RAG ----------
 print("Loading RAG system...")
 docs = load_all_documents("data")
 store = FaissVectorStore("faiss_store")
@@ -49,6 +49,7 @@ store.load()
 rag = RAGSearch(store)
 print(" RAG system ready!")
 
+# ---------- Routes ----------
 @app.route("/")
 def index():
     return render_template("chat.html", chats=load_chats())
@@ -131,3 +132,4 @@ def debug_documents():
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)
+
