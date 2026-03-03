@@ -13,8 +13,8 @@ class FaissVectorStore:
         )
         self.vectorstore = None
         self.splitter = RecursiveCharacterTextSplitter(
-            chunk_size=800,
-            chunk_overlap=180
+            chunk_size=500,
+            chunk_overlap=80
         )
 
     def build_from_documents(self, documents: List[Document]):
@@ -69,7 +69,4 @@ class FaissVectorStore:
             source = doc.metadata.get("source", "unknown")
             grouped.setdefault(source, []).append(doc.page_content)
         return grouped
-    def query_with_score(self, query: str, top_k: int = 5):
-        if not self.vectorstore:
-            raise RuntimeError("Vector store not loaded")
-        return self.vectorstore.similarity_search_with_score(query, k=top_k)
+
